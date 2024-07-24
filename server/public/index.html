@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <h2>Task Manager</h2>
+
+  <form id="taskForm">
+    <input type="text" id="taskInput" placeholder="Enter task" required>
+    <button type="button" onclick="createTask()">Add Task</button>
+  </form>
+
+  <ul id="taskList"></ul>
+
+  <script>
+    // API URL
+    const apiUrl = '/api/v1/tasks';
+
+    // Function to fetch tasks from the API
+    async function fetchTasks() {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      displayTasks(data.tasks);
+    }
+
+    // Add a click event listener to the document for update and delete buttons
+    document.addEventListener('click', function (event) {
+      const target = event.target;
+
+      // Check if the clicked element is an update button
+      if (target.classList.contains('update-button')) {
+        const taskId = target.getAttribute('data-task-id');
+        const taskName = target.getAttribute('data-task-name');
+        showUpdateForm(taskId, taskName);
+      }
+
+      // Check if the clicked element is a delete button
+      if (target.classList.contains('delete-button')) {
+        const taskId = target.getAttribute('data-task-id');
+        deleteTask(taskId);
+      }
+    });
+
+    // Function to display tasks in the UI
+    function displayTasks(tasks) {
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = '';
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span class="task-name">${task.name}</span>
+          <button class="update-button" onclick="taskList.appendChild(showUpdateForm('${task._id}', '${task.name}'))">Update</button>
+          <button class="delete-button" data-task-id="${task._id}">Delete</button>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    // Function to create a new task
+    async function createTask() {
+      const taskInput = document.getElementById('taskInput');
+      const task = { name: taskInput.value };
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(task),
+      });
+
+      const data = await response.json();
+      fetchTasks();
+      taskInput.value = '';
+    }
+
+
+    // Function to update a task
+    async function updateTask(taskId, updatedName) {
+      const response = await fetch(`${apiUrl}/${taskId}`, {
+        method: 'PATCH', // Assuming your server supports PUT for updating tasks
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: updatedName }),
+      });
+
+      const data = await response.json();
+      fetchTasks();
+    }
+
+    // Function to show the update form for a task
+    function showUpdateForm(taskId, currentName) {
+      const updateForm = document.createElement('div');
+      updateForm.className = 'update-form';
+
+      const updateInput = document.createElement('input');
+      updateInput.type = 'text';
+      updateInput.className = 'update-input';
+      updateInput.value = currentName;
+
+      const updateButton = document.createElement('button');
+      updateButton.className = 'update-button';
+      updateButton.innerHTML = 'Update';
+      updateButton.onclick = () => {
+        updateTask(taskId, updateInput.value);
+        updateForm.remove(); // Remove the update form after updating
+      };
+
+      updateForm.appendChild(updateInput);
+      updateForm.appendChild(updateButton);
+
+      return updateForm;
+    }
+
+
+    // Function to delete a task
+    async function deleteTask(taskId) {
+      const response = await fetch(`${apiUrl}/${taskId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+      fetchTasks();
+    }
+
+    // Initial fetch when the page loads
+    fetchTasks();
+  </script>
+
+</body>
+</html>
