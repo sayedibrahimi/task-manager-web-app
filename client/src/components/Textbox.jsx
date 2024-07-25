@@ -1,4 +1,4 @@
-import React from "react";
+import { memo } from "react";
 import clsx from "clsx";
 
 const Textbox = ({
@@ -40,5 +40,9 @@ const Textbox = ({
   );
 };
 
-Textbox.displayName = "Textbox";
-export default Textbox;
+// Memoize the component
+const MemoizedTextbox = memo(Textbox);
+
+MemoizedTextbox.displayName = "Textbox";
+
+export default MemoizedTextbox;

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { memo } from "react";
 
 const Button = ({ icon, className, label, type, onClick = () => {} }) => {
   return (
@@ -13,4 +14,10 @@ const Button = ({ icon, className, label, type, onClick = () => {} }) => {
   );
 };
 
-export default Button;
+// Memoize the component
+const MemoizedButton = memo(Button);
+
+// Set the display name
+MemoizedButton.displayName = "Button";
+
+export default MemoizedButton;
