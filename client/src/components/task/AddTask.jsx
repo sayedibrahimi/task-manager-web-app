@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import ModalWrapper from "../ModalWrapper";
-import { Dialog } from "@headlessui/react";
 import Textbox from "../Textbox";
 import { BiImages } from "react-icons/bi";
 import Button from "../Button";
@@ -12,11 +11,6 @@ import {
 } from "../../actions/tasksActions";
 import SelectList from "../SelectList";
 const apiUrl = import.meta.env.VITE_API_URL;
-
-// import {
-//   useCreateTaskMutation,
-//   useUpdateTaskMutation,
-// } from "../../redux/slices/api/taskApiSlice";
 
 const LISTS = ["todo", "inprogress", "completed"];
 const PRIORITY = ["high", "medium", "normal", "low"];
@@ -64,16 +58,15 @@ const AddTask = ({ open, setOpen, task, fetchAllTasks }) => {
     }
   };
 
+  console.log("AddTask component rendered");
+
   return (
     <>
       <ModalWrapper open={open} setOpen={setOpen}>
         <form onSubmit={handleOnSubmit}>
-          <Dialog.Title
-            as="h2"
-            className="text-base font-bold leading-6 text-gray-900 mb-4"
-          >
+          <h2 className="text-base font-bold leading-6 text-gray-900 mb-4">
             {task ? "UPDATE TASK" : "ADD TASK"}
-          </Dialog.Title>
+          </h2>
 
           <div className="mt-2 flex flex-col gap-6">
             <Textbox
@@ -144,7 +137,6 @@ const AddTask = ({ open, setOpen, task, fetchAllTasks }) => {
                 label="Submit"
                 type="submit"
                 className="bg-blue-600 px-8 text-sm font-semibold text-white hover:bg-blue-700  sm:w-auto rounded-full"
-                // onClick={() => setOpen(false)}
               />
 
               <Button
