@@ -6,7 +6,6 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-import { useSelector } from "react-redux";
 import {
   BGS,
   PRIOTITYSTYELS,
@@ -23,9 +22,6 @@ const ICONS = {
 };
 
 const TaskCard = ({ task }) => {
-  const { user } = useSelector((state) => state.auth);
-  const [open, setOpen] = useState(false);
-
   return (
     <>
       <div className="w-full h-fit bg-white shadow-md p-4 rounded">
