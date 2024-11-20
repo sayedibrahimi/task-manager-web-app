@@ -1,5 +1,3 @@
-# TaskManagerWebApp
-
 # Task Manager Web App
 
 This Task Manager web app allows users to manage their tasks efficiently by creating, editing, and organizing tasks. It supports user authentication, task categorization, team collaboration, and more, built using the MERN stack.
