@@ -1,9 +1,9 @@
-import { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import ModalWrapper from "./ModalWrapper";
-import { Dialog } from "@headlessui/react";
 import Button from "./Button";
 import Textbox from "./Textbox";
 import { toast } from "sonner";
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Password = ({ open, setOpen }) => {
@@ -11,53 +11,58 @@ const Password = ({ open, setOpen }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    // Password Reset
-
-    try {
-      const response = await fetch(`${apiUrl}/reset-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ password: newPassword }),
-      });
-      const res = await response.json();
-      if (response.ok) {
-        toast.success("Password changed successfully");
-        handleReset(); // Reset the state and close the modal
-      } else {
-        throw new Error(res.message || "Failed to change password");
-      }
-    } catch (error) {
-      setError("An error occurred while changing the password");
-    }
-  };
-
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setNewPassword("");
     setConfirmPassword("");
     setError("");
     setOpen(false);
-  };
+  }, [setOpen]);
+
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (newPassword !== confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiUrl}/reset-password`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ password: newPassword }),
+        });
+        const res = await response.json();
+        if (response.ok) {
+          toast.success("Password changed successfully");
+          handleReset();
+        } else {
+          throw new Error(res.message || "Failed to change password");
+        }
+      } catch (error) {
+        setError("An error occurred while changing the password");
+      }
+    },
+    [newPassword, confirmPassword, handleReset]
+  );
+
+  const handleNewPasswordChange = useCallback((e) => {
+    setNewPassword(e.target.value);
+  }, []);
+
+  const handleConfirmPasswordChange = useCallback((e) => {
+    setConfirmPassword(e.target.value);
+  }, []);
 
   return (
     <ModalWrapper open={open} setOpen={setOpen}>
-      <Dialog.Title
-        as="h2"
-        className="text-base font-bold leading-6 text-gray-900 mb-4"
-      >
+      <h2 className="text-base font-bold leading-6 text-gray-900 mb-4">
         CHANGE PASSWORD
-      </Dialog.Title>
-
+      </h2>
       <form onSubmit={handleSubmit}>
-        <div className="mt-2 flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-4">
             <Textbox
               placeholder="New Password"
@@ -66,10 +71,9 @@ const Password = ({ open, setOpen }) => {
               label="New Password"
               className="w-full rounded"
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              onChange={handleNewPasswordChange}
             />
           </div>
-
           <div className="flex flex-col gap-4">
             <Textbox
               placeholder="Confirm New Password"
@@ -78,12 +82,10 @@ const Password = ({ open, setOpen }) => {
               label="Confirm Password"
               className="w-full rounded"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={handleConfirmPasswordChange}
             />
           </div>
-
           {error && <p className="text-red-600">{error}</p>}
-
           <div className="bg-gray-50 py-6 sm:flex sm:flex-row-reverse gap-4">
             <Button
               label="Submit"
@@ -103,4 +105,10 @@ const Password = ({ open, setOpen }) => {
   );
 };
 
-export default Password;
+// Memoize the component
+const MemoizedPassword = memo(Password);
+
+// Set the display name
+MemoizedPassword.displayName = "Password";
+
+export default MemoizedPassword;
