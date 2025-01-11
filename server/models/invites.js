@@ -25,6 +25,14 @@ const inviteSchema = new Schema(
   { timestamps: true }
 );
 
+// Virtual field for inviter's name
+inviteSchema.virtual("inviterName", {
+  ref: "User",
+  localField: "inviterId", // Field in the current schema.
+  foreignField: "_id", // Field in the referenced schema.
+  justOne: true, // If true, returns a single document; if false, returns an array.
+});
+
 const Invite = mongoose.model("Invite", inviteSchema);
 
 export default Invite;
