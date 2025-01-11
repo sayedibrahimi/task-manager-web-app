@@ -1,12 +1,14 @@
+import mongoose, { Schema } from "mongoose";
+
 // Invite Schema (Separate collection)
 const inviteSchema = new Schema(
   {
-    userId: {
+    inviteeId: {
       type: Schema.Types.ObjectId,
       ref: "User", // Reference to the user the invite is for
       required: true,
     },
-    from: {
+    inviterId: {
       type: Schema.Types.ObjectId,
       ref: "User", // Reference to the user who sent the invite
       required: true,
@@ -15,6 +17,9 @@ const inviteSchema = new Schema(
       type: String,
       enum: ["pending", "accepted", "rejected"],
       default: "pending",
+    },
+    message: {
+      type: String,
     },
   },
   { timestamps: true }
