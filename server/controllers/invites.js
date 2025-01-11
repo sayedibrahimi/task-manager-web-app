@@ -2,22 +2,21 @@ import User from "../models/users.js";
 import Invite from "../models/invites.js";
 
 const invite = async (req, res) => {
-  const userId = req.user.id;
+  const inviterId = req.user.id;
   const { email, message } = req.body;
 
-  console.log(message);
-
   try {
-    const userToInvite = await User.findOne({ email });
-    if (!userToInvite) {
+    const invitee = await User.findOne({ email });
+    if (!invitee) {
       return res.status(404).json({ error: "User not found" });
     }
 
     // Create a new invite document
-    const newInvite = new invite({
-      userId: userToInvite._id, // The user being invited
-      from: userId, // The user who is sending the invite
+    const newInvite = new Invite({
+      inviteeId: invitee._id, // The user being invited
+      inviterId: inviterId, // The user who is sending the invite
       status: "pending", // Status can be "pending" by default
+      message: message,
     });
 
     // Save the new invite document
@@ -30,7 +29,7 @@ const invite = async (req, res) => {
 };
 
 const respondToInvite = async (req, res) => {
-  const userId = req.user.id;
+  const inviteeId = req.user.id;
   const { inviteId, inviteRes } = req.body;
   try {
     const invite = await Invite.findById(inviteId);
@@ -43,20 +42,26 @@ const respondToInvite = async (req, res) => {
 
     if (inviteRes === "accepted") {
       // Add the user to the inviting user's team
-      const invitingUser = await User.findById(invite.from);
-      if (!invitingUser) {
+      const inviter = await User.findById(invite.inviterId);
+      if (!inviter) {
         return res.status(404).json({ error: "Inviting user not found" });
       }
 
-      invitingUser.team.push(userId); // Add the invited user to the inviting user's team
-      const user = await User.findById(userId);
-      if (!user) {
+      const invitee = await User.findById(inviteeId);
+      if (!invitee) {
         return res.status(404).json({ error: "User not found" });
       }
 
-      user.team.push(invite.from); // Add the inviting user to the accepted user's team
-      await invitingUser.save();
-      await user.save();
+      // Avoid duplicates in the team array
+      if (!inviter.team.includes(inviteeId)) {
+        inviter.team.push(inviteeId);
+        await inviter.save();
+      }
+
+      if (!invitee.team.includes(invite.inviterId)) {
+        invitee.team.push(invite.inviterId); // Add the inviting user to the accepted user's team
+        await invitee.save();
+      }
     }
 
     res.status(200).json({ message: "Invite response recorded" });
