@@ -76,8 +76,12 @@ const getAllInvites = async (req, res) => {
   try {
     // Query the Invite collection for all invites where the userId is either the invited user or the sender
     const invites = await Invite.find({
-      $or: [{ userId }, { from: userId }], // Find invites where the user is either the invitee or the sender
-    });
+      $or: [{ inviterId: userId }, { inviteeId: userId }], // Find invites where the user is either the invitee or the in inviter
+    })
+      .populate("inviterId", "firstName") // Populate inviter's name and email
+      .populate("inviteeId", "firstName") // Optionally populate the invitee's details too
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .exec();
 
     if (!invites || invites.length === 0) {
       return res.status(404).json({ error: "No invites found" });
