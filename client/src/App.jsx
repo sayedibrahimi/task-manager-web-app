@@ -1,23 +1,24 @@
+/**
+ * Main application component that handles routing and layout structure.
+ * Implements protected routes with authentication checks and responsive layout.
+ * Uses react-router-dom for navigation and sonner for toast notifications.
+ *
+ * Routes are split between authenticated (wrapped in Layout) and public routes.
+ * Authenticated routes include dashboard, tasks, team management, and trash.
+ * Public routes are login and signup.
+ *
+ * @file App.jsx
+ */
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
-import { useDispatch, useSelector } from "react-redux";
-import fetchUser from "./actions/usersActions";
-import { UserProvider } from "../src/context.js/userInfo.jsx";
-
-import { Dashboard, Login, Signup, Tasks, Trash, Users } from "./pages";
-
+import { UserProvider } from "./context/userInfo.jsx";
+import { Dashboard, Login, Signup, Tasks, Trash, Team } from "./pages";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
-import { useEffect, useState } from "react";
-import { useUser } from "./context.js/userInfo.jsx";
+import { useUser } from "./context/userInfo.jsx";
 
 function Layout() {
-  // const { user } = useSelector((state) => state.auth.user);
-  // const { isLoading } = useSelector((state) => state.auth.loading);
   const location = useLocation();
-
-  // const token = localStorage.getItem("token");
-
   const { userInfo, loading } = useUser();
 
   if (loading) {
@@ -40,7 +41,6 @@ function Layout() {
 
       <div className="flex-1 overflow-y-auto">
         <Navbar />
-
         <div className="p-4 2xl:px-10">{<Outlet />}</div>
       </div>
     </div>
@@ -59,9 +59,8 @@ function App() {
             <Route path="/completed/:stage?" element={<Tasks />} />
             <Route path="/inprogress/:stage?" element={<Tasks />} />
             <Route path="/todo/:stage?" element={<Tasks />} />
-            <Route path="/team" element={<Users />} />
+            <Route path="/team" element={<Team />} />
             <Route path="/trashed" element={<Trash />} />
-            {/* <Route path="/task/:id" element={<TaskDetails />} /> */}
           </Route>
 
           <Route path="/login" element={<Login />} />
