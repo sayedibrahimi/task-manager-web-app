@@ -1,20 +1,41 @@
-import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+/**
+ * Login component that handles user authentication
+ *
+ * Features:
+ * - Email and password validation
+ * - Rate limiting (5 attempts before 60-second cooldown)
+ * - Loading states to prevent double submission
+ * - Error handling and user feedback via toast notifications
+ * - Responsive layout that works on mobile and desktop
+ *
+ * On successful login:
+ * - Stores authentication token in localStorage
+ * - Redirects user to dashboard
+ *
+ * Component State:
+ * - userInfo: Tracks email and password input values
+ * - error: Stores validation errors for form fields
+ * - loginAttempts: Counts failed login attempts
+ * - cooldown: Enables rate limiting after too many failed attempts
+ * - loading: Prevents multiple form submissions while processing
+ *
+ * Required Environment Variables:
+ * - VITE_API_URL: Base URL for the authentication API
+ */
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import Textbox from "../components/Textbox";
 import Button from "../components/Button";
-import { useDispatch, useSelector } from "react-redux";
-// import { setCredentials } from "../redux/slices/authSlice";
-// import { useLoginMutation } from "../redux/slices/api/authApiSlice";
-// import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Login = () => {
-  // const { user } = useSelector((state) => state.auth); // entire Redux store state as 'state'
-
   const [userInfo, setUserInfo] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const [error, setError] = useState({});
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [cooldown, setCooldown] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = ({ currentTarget: input }) => {
     setUserInfo({ ...userInfo, [input.name]: input.value });
@@ -22,6 +43,28 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (cooldown) {
+      toast.error("Please wait before trying again.");
+      return;
+    }
+
+    // Prevent multiple clicks while loading
+    if (loading) return;
+
+    const errors = {};
+    if (!userInfo.email) errors.email = "Email is required.";
+    if (!userInfo.password) errors.password = "Password is required.";
+
+    if (Object.keys(errors).length > 0) {
+      setError(errors);
+      return;
+    }
+
+    setLoginAttempts((prev) => prev + 1);
+
+    setLoading(true); // Set loading state to true
+
     try {
       const response = await fetch(`${apiUrl}/auth`, {
         method: "POST",
@@ -35,16 +78,19 @@ const Login = () => {
         localStorage.setItem("token", res.token);
         window.location = `/dashboard`;
       } else {
-        throw new Error(res.message || "Failed to authenticate");
+        toast.error(res.message || "Email or password is incorrect.");
       }
     } catch (error) {
-      setError("An error occurred while authenticating");
+      toast.error("An error occurred while authenticating.");
+    } finally {
+      if (loginAttempts + 1 >= 5) {
+        setCooldown(true);
+        setTimeout(() => setCooldown(false), 60000); // Cooldown for 60 seconds
+        setLoginAttempts(0); // Reset attempts
+      }
+      setLoading(false); // Reset loading state
     }
   };
-
-  // useEffect(() => {
-  //   user && navigate("/dashboard");
-  // }, [user]);
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center flex-col lg:flex-row bg-[#f3f4f6]">
@@ -61,24 +107,24 @@ const Login = () => {
 
           <div className="flex flex-col gap-y-2">
             <Textbox
-              placeholder="you@example.com"
+              placeholder="john.doe@example.com"
               type="email"
               name="email"
               label="Email Address"
               className="w-full rounded-full"
               value={userInfo.email}
               onChange={handleChange}
-              error={error.email ? error.email : ""}
+              error={error.email || ""}
             />
             <Textbox
-              placeholder="password"
+              placeholder="********"
               type="password"
               name="password"
               label="Password"
               className="w-full rounded-full"
               value={userInfo.password}
               onChange={handleChange}
-              error={error.password ? error.password : ""}
+              error={error.password || ""}
             />
             <span className="text-sm text-gray-600 hover:underline cursor-pointer">
               Forget Password?
@@ -88,6 +134,8 @@ const Login = () => {
             type="submit"
             label="Log in"
             className="w-full h-10 bg-blue-700 text-white rounded-full"
+            disabled={loading}
+            loading={loading}
           />
           <Link
             to="/signup"
