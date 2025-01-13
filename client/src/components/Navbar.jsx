@@ -1,13 +1,19 @@
+/**
+ * Navigation bar component that displays at the top of the application.
+ * Features a responsive design with:
+ * - Mobile hamburger menu for sidebar navigation
+ * - Search bar with icon
+ * - Notification panel
+ * - User avatar
+ *
+ * The navbar stays fixed at the top of the viewport and includes a white background
+ * with consistent padding across different screen sizes.
+ */
 import { MdOutlineSearch } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
-import { setOpenSidebar } from "../redux/slices/authSlice";
 import UserAvatar from "./UserAvatar";
-// import NotificationPanel from "./NotificationPanel";
+import NotificationPanel from "./NotificationPanel";
 
 const Navbar = () => {
-  // const { user } = useSelector((state) => state.auth);
-  // const dispatch = useDispatch();
-
   return (
     <div className="flex justify-between items-center bg-white px-4 py-3 2xl:py-4 sticky z-10 top-0">
       <div className="flex gap-4">
@@ -30,7 +36,7 @@ const Navbar = () => {
       </div>
 
       <div className="flex gap-2 items-center">
-        {/* <NotificationPanel /> */}
+        <NotificationPanel />
 
         <UserAvatar />
       </div>
