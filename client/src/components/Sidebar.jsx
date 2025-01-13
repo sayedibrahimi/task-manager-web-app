@@ -1,3 +1,21 @@
+/**
+ * Sidebar Component
+ *
+ * A responsive navigation sidebar component for RavâlFlow task management application.
+ * Renders a list of navigation links with icons for different sections of the app
+ * including Dashboard, Tasks, Task Status views (Completed, In Progress, To Do),
+ * Team management,Trash, and Settings.
+ *
+ * Features:
+ * - Responsive design with Tailwind CSS
+ * - Active route highlighting
+ * - Consistent icon usage with react-icons
+ *
+ * @component
+ * @uses {react-router-dom} For navigation and route matching
+ * @uses {react-icons} For navigation and interface icons
+ * @uses {clsx} For conditional class name handling
+ */
 import React from "react";
 import {
   MdDashboard,
@@ -8,13 +26,10 @@ import {
 } from "react-icons/md";
 import { GrInProgress } from "react-icons/gr";
 import { FaTasks, FaTrashAlt, FaUsers } from "react-icons/fa";
-// import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-// import { setOpenSidebar } from "../redux/slices/authSlice";
 import clsx from "clsx";
-import { useSelector } from "react-redux";
 
-const linkData = [
+const sideBarLinks = [
   {
     label: "Dashboard",
     link: "dashboard",
@@ -53,24 +68,13 @@ const linkData = [
 ];
 
 const Sidebar = () => {
-  const { user } = useSelector((state) => state.auth);
-  // const token = localStorage.getItem("token");
-  // const dispatch = useDispatch();
   const location = useLocation(); // object that contains property pathname
-
   const path = location.pathname.split("/")[1];
-
-  const sidebarLinks = user?.isAdmin ? linkData : linkData.slice(0, 7);
-
-  // const closeSidebar = () => {
-  //   dispatch(setOpenSidebar(false));
-  // };
 
   const NavLink = ({ el }) => {
     return (
       <Link
         to={el.link}
-        // onClick={closeSidebar}
         className={clsx(
           "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center text-gray-800 text-base hover:bg-[#2564ed2d]",
           path === el.link.split("/")[0] ? "bg-blue-700 text-neutral-100" : ""
@@ -91,7 +95,7 @@ const Sidebar = () => {
       </h1>
 
       <div className="flex-1 flex flex-col gap-y-5 py-8">
-        {sidebarLinks.map((link) => (
+        {sideBarLinks.map((link) => (
           <NavLink el={link} key={link.label} />
         ))}
       </div>
@@ -99,7 +103,7 @@ const Sidebar = () => {
       <div className="">
         <button className="w-full flex gap-2 p-2 items-center text-lg text-gray-800">
           <MdSettings />
-          <span>to</span>
+          <span>Settings</span>
         </button>
       </div>
     </div>
