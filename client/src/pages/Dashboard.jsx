@@ -16,7 +16,7 @@ import UserInfo from "../components/UserInfo";
 // import { useGetDasboardStatsQuery } from "../redux/slices/api/taskApiSlice";
 import { useSelector } from "react-redux";
 import { fetchDashboardStatistics, fetchTasks } from "../actions/tasksActions";
-import { useUser } from "../context.js/userInfo";
+import { useUser } from "../context/userInfo";
 
 const Dashboard = () => {
   // const { data, isLoading, error } = useGetDasboardStatsQuery();

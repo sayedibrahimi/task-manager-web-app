@@ -1,7 +1,7 @@
 import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { getInitials } from "../utils";
-import { useUser } from "../context.js/userInfo";
+import { useUser } from "../context/userInfo";
 
 const UserInfo = ({ user }) => {
   const { userInfo } = useUser();

@@ -3,7 +3,7 @@ import { FaUser, FaUserLock } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 import { getInitials } from "../utils";
 import Password from "./Password";
-import { useUser } from "../context.js/userInfo";
+import { useUser } from "../context/userInfo";
 
 const UserAvatar = () => {
   const [open, setOpen] = useState(false);
