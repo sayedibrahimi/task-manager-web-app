@@ -12,10 +12,8 @@ import Tabs from "../components/Tabs";
 // import { tasks } from "../assets/data";
 import Table from "../components/Table";
 import AddTask from "../components/task/AddTask";
-import { useSelector } from "react-redux";
 import { fetchTasks } from "../actions/tasksActions";
 import BoardView from "../components/task/BoardView";
-// import { useGetAllTaskQuery } from "../redux/slices/api/taskApiSlice";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const TABS = [
@@ -31,7 +29,6 @@ const TASK_TYPE = {
 
 const Tasks = () => {
   const params = useParams();
-  const { user } = useSelector((state) => state.auth);
   const [searchParams] = useSearchParams();
   const [searchTerm] = useState(searchParams.get("search") || "");
 
