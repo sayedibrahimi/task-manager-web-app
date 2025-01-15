@@ -9,6 +9,7 @@ import auth from "./routes/auth.js";
 import users from "./routes/users.js";
 import tasks from "./routes/tasks.js";
 import invites from "./routes/invites.js";
+import team from "./routes/team.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -29,6 +30,7 @@ app.use("/api/v1/auth", auth);
 app.use("/api/v1/users", users);
 app.use("/api/v1/tasks", tasks);
 app.use("/api/v1/invites", invites);
+app.use("/api/v1/team", team);
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
